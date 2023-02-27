@@ -17,9 +17,9 @@
 		return () => clearInterval(handle)
 	})
 
-    // Custamizations
+    // Customizations
 
-    let split = false
+    let split = true
 
     let odd_heart: Boolean
     $: odd_heart = hours.at(-1) === '1'
@@ -48,8 +48,12 @@
 <style lang="scss">
     $main: #f280a1;
     $secondary: #9966cc;
+    
     $diameter: 16vw;
     $diameter-height-breakpoint: 26vh;
+
+    $diameter-vertical: 15vh;
+    $diameter-height-breakpoint-vertical: 26vw;
 
     * {
         font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -97,6 +101,25 @@
     }
 
     .heart.odd_heart {
-        fill: $secondary
+        fill: $secondary;
+    }
+
+    @media (max-width: 800px) {
+        .container {
+            justify-content: center;
+            flex-direction: row;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: column-reverse;
+            
+        }
+        
+        .circle {
+            height: min($diameter-vertical, $diameter-height-breakpoint-vertical);
+            width: $diameter-vertical;
+            max-width: $diameter-height-breakpoint-vertical;
+        }
     }
 </style>
