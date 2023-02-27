@@ -104,7 +104,7 @@
         fill: $secondary;
     }
 
-    @media (max-width: 800px) {
+    @media (orientation: portrait) {
         .container {
             justify-content: center;
             flex-direction: row;
