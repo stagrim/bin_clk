@@ -20,10 +20,17 @@
     // Customizations
 
     let split = true
+    let snow = false
 
     let odd_heart: Boolean
     $: odd_heart = hours.at(-1) === '1'
 </script>
+
+{#if snow}
+    {#each Array(60) as i}
+        <div class="snow"></div>
+    {/each}
+{/if}
 
 <div class="container">
     {#each [hours, minutes, seconds] as row, i}
@@ -34,7 +41,9 @@
                     <div class="circle" class:secondary style="visibility: hidden"></div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
-                    <div class="circle" class:secondary class:active></div>
+                    <div class="circle" class:secondary class:active>
+                        <div class="legend">{2 ** (5-j)}</div>
+                    </div>
                 {/if}
             {/each}
         </div>
@@ -46,6 +55,12 @@
 </p>
     
 <style lang="scss">
+    @font-face {
+        font-family: 'Roboto Mono';
+        src: url('/RobotoMono-VariableFont_wght.ttf');
+    }
+
+    $background: #0e0e0e;
     $main: #f280a1;
     $secondary: #9966cc;
     
@@ -54,6 +69,11 @@
 
     $diameter-vertical: 15vh;
     $diameter-height-breakpoint-vertical: 26vw;
+
+    :global(body) {
+        background-color: #0e0e0e;
+        font-size: 16px;
+    }
 
     * {
         font-family: "Roboto", "Helvetica", "Arial", sans-serif;
@@ -69,6 +89,7 @@
     .row {
         display: flex;
     }
+
     .circle {
         width: min($diameter, $diameter-height-breakpoint);
         height: $diameter;
@@ -77,14 +98,33 @@
         background-color: #2e2e2e;
         border-radius: 50%;
         transition: 0.1s;
+        color: white;
+
+        display: flex;
+        justify-content: center;
+        vertical-align: middle;
+        align-items: center;
+        color: $main;
     }
 
     .circle.active {
         background-color: $main;
+        color: $background;
+    }
+
+    .circle.secondary {
+        color: $secondary;
     }
 
     .circle.secondary.active {
         background-color: $secondary;
+        color: $background;
+    }
+
+    .circle .legend {
+        font-family: Roboto Mono;
+        font-weight: 700;
+        font-size: 3.5rem;
     }
 
     .footer {
@@ -120,6 +160,58 @@
             height: min($diameter-vertical, $diameter-height-breakpoint-vertical);
             width: $diameter-vertical;
             max-width: $diameter-height-breakpoint-vertical;
+        }
+    }
+
+    // Snow effects
+
+    :global(body) {
+        /* height: 100vh; */
+        /* background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%); */
+        overflow: hidden;
+    }
+
+    @function random_range($min, $max) {
+        $rand: random();
+        $random_range: $min + floor($rand * (($max - $min) + 1));
+        @return $random_range;
+    }
+
+    .snow {
+        filter: drop-shadow(0 0 10px white);
+        $total: 200;
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border-radius: 50%;
+
+        @for $i from 1 through $total {
+            $random-x: random(1000000) * 0.0001vw;
+            $random-offset: random_range(-100000, 100000) * 0.0001vw;
+            $random-x-end: $random-x + $random-offset;
+            $random-x-end-yoyo: $random-x + ($random-offset / 2);
+            $random-yoyo-time: random_range(30000, 80000) / 100000;
+            $random-yoyo-y: $random-yoyo-time * 100vh;
+            $random-scale: random(10000) * 0.0001;
+            $fall-duration: random_range(10, 30) * 1s;
+            $fall-delay: random(30) * -1s;
+
+            &:nth-child(#{$i}) {
+                opacity: random(10000) * 0.0001;
+                transform: translate($random-x, -10px) scale($random-scale);
+                animation: fall-#{$i} $fall-duration $fall-delay linear infinite;
+            }
+
+            @keyframes fall-#{$i} {
+                #{percentage($random-yoyo-time)} {
+                    transform: translate($random-x-end, $random-yoyo-y) scale($random-scale);
+                }
+
+                to {
+                    transform: translate($random-x-end-yoyo, 100vh) scale($random-scale);
+                }
+            }
         }
     }
 </style>
