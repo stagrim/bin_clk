@@ -12,14 +12,6 @@
 	$: minutes = to_bin(time.getMinutes())
 	$: seconds = to_bin(time.getSeconds())
 
-	onMount(() => {
-		const handle = setInterval(() => time = new Date(), 1000)
-
-		return () => clearInterval(handle)
-	})
-
-    // Customizations
-
     interface Config {
         split: boolean,
         numbers: boolean,
@@ -34,16 +26,18 @@
         winter: false
     }
 
-    onMount(() => {
+	onMount(() => {
+		const handle = setInterval(() => time = new Date(), 1000)
+
         config = {
             split: !$page.url.searchParams.has("split"),
             numbers: !$page.url.searchParams.has("numbers"),
             show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
             winter: $page.url.searchParams.has("winter"),
         }
-    })
 
-    $: config, console.log(config)
+		return () => clearInterval(handle)
+	})
 
     let odd_heart: boolean
     $: odd_heart = hours.at(-1) === '1'
