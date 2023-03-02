@@ -27,12 +27,21 @@
         winter: boolean,
     }
 
-    $: config = {
-        split: !$page.url.searchParams.has("split"),
-        numbers: !$page.url.searchParams.has("numbers"),
-        show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
-        winter: $page.url.searchParams.has("winter"),
+    let config: Config = {
+        split: true,
+        numbers: true,
+        show_inactive_numbers: false,
+        winter: false
     }
+
+    onMount(() => {
+        config = {
+            split: !$page.url.searchParams.has("split"),
+            numbers: !$page.url.searchParams.has("numbers"),
+            show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
+            winter: $page.url.searchParams.has("winter"),
+        }
+    })
 
     $: config, console.log(config)
 
