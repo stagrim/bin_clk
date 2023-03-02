@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from "svelte";
+    import { page } from '$app/stores';
     export const prerender = true;
 
     let time = new Date();
@@ -19,17 +20,28 @@
 
     // Customizations
 
-    let split = true
-    let numbers = true
-    let show_inactive_numbers = false
-    let snow = false
+    interface Config {
+        split: boolean,
+        numbers: boolean,
+        show_inactive_numbers: boolean
+        winter: boolean,
+    }
 
-    let odd_heart: Boolean
+    $: config = {
+        split: !$page.url.searchParams.has("split"),
+        numbers: !$page.url.searchParams.has("numbers"),
+        show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
+        winter: $page.url.searchParams.has("winter"),
+    }
+
+    $: config, console.log(config)
+
+    let odd_heart: boolean
     $: odd_heart = hours.at(-1) === '1'
 </script>
 
-{#if snow}
-    {#each Array(60) as i}
+{#if config.winter}
+    {#each Array(100) as i}
         <div class="snow"></div>
     {/each}
 {/if}
@@ -38,13 +50,13 @@
     {#each [hours, minutes, seconds] as row, i}
         <div class="row">
             {#each row.split('') as unit, j}
-                {@const secondary = split && (i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
+                {@const secondary = config.split && (i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
                 {#if unit === '-'}
                     <div class="circle" class:secondary style="visibility: hidden"></div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
-                    <div class="circle" class:secondary class:active class:show_inactive_numbers>
-                        {#if numbers}
+                    <div class="circle" class:secondary class:active class:show_inactive_numbers={config.show_inactive_numbers}>
+                        {#if config.numbers}
                             <div class="legend">{2 ** (5-j)}</div>
                         {/if}
                     </div>
