@@ -20,6 +20,8 @@
     // Customizations
 
     let split = true
+    let numbers = true
+    let show_inactive_numbers = false
     let snow = false
 
     let odd_heart: Boolean
@@ -41,8 +43,10 @@
                     <div class="circle" class:secondary style="visibility: hidden"></div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
-                    <div class="circle" class:secondary class:active>
-                        <div class="legend">{2 ** (5-j)}</div>
+                    <div class="circle" class:secondary class:active class:show_inactive_numbers>
+                        {#if numbers}
+                            <div class="legend">{2 ** (5-j)}</div>
+                        {/if}
                     </div>
                 {/if}
             {/each}
@@ -61,6 +65,7 @@
     }
 
     $background: #0e0e0e;
+    $inactive: #2e2e2e;
     $main: #f280a1;
     $secondary: #9966cc;
     
@@ -71,7 +76,7 @@
     $diameter-height-breakpoint-vertical: 26vw;
 
     :global(body) {
-        background-color: #0e0e0e;
+        background-color: $background;
         font-size: 16px;
     }
 
@@ -95,30 +100,33 @@
         height: $diameter;
         max-height: $diameter-height-breakpoint;
         margin: 5px;
-        background-color: #2e2e2e;
+        background-color: $inactive;
         border-radius: 50%;
         transition: 0.1s;
-        color: white;
 
         display: flex;
         justify-content: center;
         vertical-align: middle;
         align-items: center;
+        color: $inactive;
+    }
+
+    .circle.show_inactive_numbers {
         color: $main;
+    }
+
+    .circle.secondary.show_inactive_numbers {
+        color: $secondary;
     }
 
     .circle.active {
         background-color: $main;
-        color: $background;
-    }
-
-    .circle.secondary {
-        color: $secondary;
+        color: $inactive;
     }
 
     .circle.secondary.active {
         background-color: $secondary;
-        color: $background;
+        color: $inactive;
     }
 
     .circle .legend {
