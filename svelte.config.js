@@ -10,7 +10,7 @@ const config = {
 
 	kit: {
 		paths: {
-			base: dev ? '' : '/bin_clk',
+			base: dev ? '' : '/basta',
 		},
 		adapter: adapter({
 			// default options are shown. On some platforms
