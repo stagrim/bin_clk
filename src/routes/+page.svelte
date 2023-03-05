@@ -5,35 +5,36 @@
 
     let time = new Date();
 
+    let config = {
+        split: true,
+        numbers: true,
+        show_inactive_numbers: false,
+        winter: false,
+        true_binary_seconds: false,
+    }
+
     const to_bin = (num: number, pad: number = 6) => 
         num.toString(2).padStart(pad, '0')
     
     $: hours = to_bin(time.getHours(), 5).padStart(6, '-')
 	$: minutes = to_bin(time.getMinutes())
-	$: seconds = to_bin(time.getSeconds())
-
-    interface Config {
-        split: boolean,
-        numbers: boolean,
-        show_inactive_numbers: boolean
-        winter: boolean,
-    }
-
-    let config: Config = {
-        split: true,
-        numbers: true,
-        show_inactive_numbers: false,
-        winter: false
-    }
+    // get 64:th of a second seconds version: Math.round((time.getSeconds() * time.getMilliseconds()) / 937.5)
+	$: seconds = to_bin(config.true_binary_seconds ? Math.floor((time.getSeconds() + (time.getMilliseconds() / 1000)) / 0.9375) : time.getSeconds())
 
 	onMount(() => {
-		const handle = setInterval(() => time = new Date(), 1000)
-
         config = {
             split: !$page.url.searchParams.has("split"),
             numbers: !$page.url.searchParams.has("numbers"),
             show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
             winter: $page.url.searchParams.has("winter"),
+            true_binary_seconds: $page.url.searchParams.has("true_binary_seconds"),
+        }
+
+		let handle: NodeJS.Timer
+        if (config.true_binary_seconds) {
+            handle = setInterval(() => time = new Date(), 937.5)
+        } else {
+            handle = setInterval(() => time = new Date(), 1000)
         }
 
 		return () => clearInterval(handle)
@@ -55,7 +56,7 @@
             {#each row.split('') as unit, j}
                 {@const secondary = config.split && (i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
                 {#if unit === '-'}
-                    <div class="circle" class:secondary style="visibility: hidden"></div>
+                    <div class="circle" class:secondary style=""></div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
                     <div class="circle" class:secondary class:active class:show_inactive_numbers={config.show_inactive_numbers}>
