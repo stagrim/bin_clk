@@ -15,7 +15,10 @@
 
     const to_bin = (num: number, pad: number = 6) => 
         num.toString(2).padStart(pad, '0')
-    
+
+    const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+
+    $: weekday = weekdays[time.getDay()]
     $: hours = to_bin(time.getHours(), 5).padStart(6, '-')
 	$: minutes = to_bin(time.getMinutes())
     // get 64:th of a second seconds version: Math.round((time.getSeconds() * time.getMilliseconds()) / 937.5)
@@ -42,11 +45,14 @@
 
     let odd_heart: boolean
     $: odd_heart = hours.at(-1) === '1'
+
+    const random_snowflake = () =>
+        `&#1005${Math.floor(Math.random() * 3 + 2)}`
 </script>
 
 {#if config.winter}
-    {#each Array(100) as i}
-        <div class="snow"></div>
+    {#each Array(75) as i}
+        <div class="snow">{@html random_snowflake()}</div>
     {/each}
 {/if}
 
@@ -56,7 +62,9 @@
             {#each row.split('') as unit, j}
                 {@const secondary = config.split && (i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
                 {#if unit === '-'}
-                    <div class="circle" class:secondary style=""></div>
+                    <div class="circle show_inactive_numbers" class:active={odd_heart} class:secondary>
+                        <div class="legend">{weekday}</div>
+                    </div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
                     <div class="circle" class:secondary class:active class:show_inactive_numbers={config.show_inactive_numbers}>
@@ -202,13 +210,14 @@
     }
 
     .snow {
-        filter: drop-shadow(0 0 10px white);
+        // filter: drop-shadow(0 0 10px white);
         $total: 200;
         position: absolute;
         width: 10px;
         height: 10px;
-        background: white;
-        border-radius: 50%;
+        // background: white;
+        // border-radius: 50%;
+        color: white;
 
         @for $i from 1 through $total {
             $random-x: random(1000000) * 0.0001vw;
@@ -217,13 +226,14 @@
             $random-x-end-yoyo: $random-x + ($random-offset / 2);
             $random-yoyo-time: random_range(30000, 80000) / 100000;
             $random-yoyo-y: $random-yoyo-time * 100vh;
-            $random-scale: random(10000) * 0.0001;
+            $random-scale: random(3);
             $fall-duration: random_range(10, 30) * 1s;
             $fall-delay: random(30) * -1s;
+            $rotate: random(720) * 1deg - 360deg;
 
             &:nth-child(#{$i}) {
-                opacity: random(10000) * 0.0001;
-                transform: translate($random-x, -10px) scale($random-scale);
+                opacity: random(7000) * 0.0001 + 0.3;
+                transform: translate($random-x, -60px) scale($random-scale) rotate($rotate);
                 animation: fall-#{$i} $fall-duration $fall-delay linear infinite;
             }
 
@@ -233,7 +243,7 @@
                 }
 
                 to {
-                    transform: translate($random-x-end-yoyo, 100vh) scale($random-scale);
+                    transform: translate($random-x-end-yoyo, 100vh) scale($random-scale) rotate($rotate);
                 }
             }
         }
