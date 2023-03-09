@@ -11,6 +11,7 @@
         show_inactive_numbers: false,
         winter: false,
         true_binary_seconds: false,
+        info: "",
     }
 
     const to_bin = (num: number, pad: number = 6) => 
@@ -31,6 +32,7 @@
             show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
             winter: $page.url.searchParams.has("winter"),
             true_binary_seconds: $page.url.searchParams.has("true_binary_seconds"),
+            info: $page.url.searchParams.get("info") ?? "",
         }
 
 		let handle: NodeJS.Timer
@@ -48,6 +50,16 @@
 
     const random_snowflake = () =>
         `&#1005${Math.floor(Math.random() * 3 + 2)}`
+
+    let rotate_memory = {
+        h: 0,
+        m: 0,
+        s: 0,
+    }
+
+    /** Will add right amounts of full rotations depending on full rotations completed to avoid css transition wack */
+    const rotate = (type: "s" | "m" | "h", deg: number) =>
+        (deg === 0 ? ++rotate_memory[type] : rotate_memory[type]) * 360 + deg
 </script>
 
 {#if config.winter}
@@ -60,10 +72,23 @@
     {#each [hours, minutes, seconds] as row, i}
         <div class="row">
             {#each row.split('') as unit, j}
-                {@const secondary = config.split && (i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
+                {@const secondary = config.split && !(i % 2 == 0 ? j % 2 == 0 : j % 2 == 1)}
                 {#if unit === '-'}
-                    <div class="circle show_inactive_numbers" class:active={odd_heart} class:secondary>
-                        <div class="legend">{weekday}</div>
+                    <div class="circle show_inactive_numbers" style:visibility={config.info ? "visible" : "hidden"} class:clock={config.info === "2"} class:active={odd_heart} class:secondary>
+
+                        {#if config.info === "1" }
+                            <div class="legend">{weekday}</div>
+                        {:else if config.info === "2"}
+                            {@const s = 6 * time.getSeconds()}
+                            {@const m = 6 * time.getMinutes()} 
+                            {@const h = 30 * time.getHours() + time.getMinutes() / 2}
+                            
+                            <div id="hour"   style:transform={`rotate(${rotate("h", h)}deg)`}></div>
+                            <div id="minute" style:transform={`rotate(${rotate("m", m)}deg)`}></div>
+                            <div id="second" style:transform={`rotate(${rotate("s", s)}deg)`}></div>
+                            <div id="blob"></div>
+                        {/if}
+
                     </div>
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
@@ -83,6 +108,7 @@
 </p>
     
 <style lang="scss">
+    //TODO: break out some styling parts to different files
     @font-face {
         font-family: 'Roboto Mono';
         src: url('/RobotoMono-VariableFont_wght.ttf');
@@ -177,6 +203,10 @@
     }
 
     @media (orientation: portrait) {
+        .clock {
+            box-shadow: 0 0 0 0.5vh $main inset;
+        }
+
         .container {
             justify-content: center;
             flex-direction: row;
@@ -247,5 +277,63 @@
                 }
             }
         }
+    }
+
+    // Analog clock
+
+    .clock {
+        box-shadow: 0 0 0 0.5vw $main inset;
+        display: flex;
+        justify-content: center;
+        position: relative;
+    }
+
+    $blob-diameter: 10%;
+    #blob {
+        position: absolute;
+        background: $main;
+        width: $blob-diameter;
+        height: $blob-diameter;
+        border-radius: 50%;
+    }
+
+    #hour,
+    #minute,
+    #second {
+        position: absolute;
+        background-color: $main;
+        transform-origin: bottom center;
+        border-radius: 1px;
+        transition: 1s linear;
+    }
+
+    .active {
+        #hour,
+        #minute,
+        #second,
+        #blob {
+            background: $inactive;
+        }
+    }
+    
+    $hour-length: 20%;
+    #hour {
+        width: 5%;
+        height: $hour-length;
+        margin-top: -$hour-length;
+    }
+    
+    $minute-length: 35%;
+    #minute {
+        width: 5%;
+        height: $minute-length;
+        margin-top: -$minute-length;
+    }
+
+    $second-length: 40%;
+    #second {
+        width: 2%;
+        height: $second-length;
+        margin-top: -$second-length;
     }
 </style>
