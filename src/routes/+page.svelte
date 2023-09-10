@@ -50,16 +50,25 @@
 
     const random_snowflake = () =>
         `&#1005${Math.floor(Math.random() * 3 + 2)}`
-
-    let rotate_memory = {
-        h: 0,
-        m: 0,
-        s: 0,
+    
+    /**
+     * Returns amount of degrees rotated since midnight for h, m, s
+     * @param now current time for rotations
+     */
+    const analog_rotate = (now: Date) => {
+        const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0,0,0)
+        const mil_delta = now.getTime() - midnight.getTime()
+        // time since midnight
+        const h = mil_delta / (1000 * 60 * 60)
+        const m = h * 60
+        const s = m * 60
+        // convert time to rotations since midnight
+        return {
+            h: h * 30 + h / 2,
+            m: m * 6,
+            s: s * 6
+        }
     }
-
-    /** Will add right amounts of full rotations depending on full rotations completed to avoid css transition wack */
-    const rotate = (type: "s" | "m" | "h", deg: number) =>
-        (deg === 0 ? ++rotate_memory[type] : rotate_memory[type]) * 360 + deg
 </script>
 
 {#if config.winter}
@@ -79,13 +88,12 @@
                         {#if config.info === "1" }
                             <div class="legend">{weekday}</div>
                         {:else if config.info === "2"}
-                            {@const s = 6 * time.getSeconds()}
-                            {@const m = 6 * time.getMinutes()} 
-                            {@const h = 30 * time.getHours() + time.getMinutes() / 2}
+                            {@const { h, m, s} = analog_rotate(time)}
+                            <!-- {@const _ = console.log({s, m, h})} -->
                             
-                            <div id="hour"   style:transform={`rotate(${rotate("h", h)}deg)`}></div>
-                            <div id="minute" style:transform={`rotate(${rotate("m", m)}deg)`}></div>
-                            <div id="second" style:transform={`rotate(${rotate("s", s)}deg)`}></div>
+                            <div id="hour"   style:transform={`rotate(${h}deg)`}></div>
+                            <div id="minute" style:transform={`rotate(${m}deg)`}></div>
+                            <div id="second" style:transform={`rotate(${s}deg)`}></div>
                             <div id="blob"></div>
                         {/if}
 
