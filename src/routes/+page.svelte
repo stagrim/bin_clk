@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from "svelte";
     import { page } from '$app/stores';
+    import { fade } from "svelte/transition";
     export const prerender = true;
 
     let time = new Date();
@@ -14,7 +15,7 @@
         info: "",
     }
 
-    const to_bin = (num: number, pad: number = 6) => 
+    const to_bin = (num: number, pad: number = 6) =>
         num.toString(2).padStart(pad, '0')
 
     const weekdays = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
@@ -35,7 +36,7 @@
             info: $page.url.searchParams.get("info") ?? "",
         }
 
-		let handle: NodeJS.Timer
+		let handle: number
         if (config.true_binary_seconds) {
             handle = setInterval(() => time = new Date(), 937.5)
         } else {
@@ -50,7 +51,7 @@
 
     const random_snowflake = () =>
         `&#1005${Math.floor(Math.random() * 3 + 2)}`
-    
+
     /**
      * Returns amount of degrees rotated since midnight for h, m, s
      * @param now current time for rotations
@@ -64,9 +65,9 @@
         const s = m * 60
         // convert time to rotations since midnight
         return {
-            h: h * 30 + h / 2,
-            m: m * 6,
-            s: s * 6
+            h: Math.round(h * 30 + h / 2),
+            m: Math.round(m * 6),
+            s: Math.round(s * 6)
         }
     }
 </script>
@@ -89,8 +90,8 @@
                             <div class="legend">{weekday}</div>
                         {:else if config.info === "2"}
                             {@const { h, m, s} = analog_rotate(time)}
-                            <!-- {@const _ = console.log({s, m, h})} -->
-                            
+                            {@const _ = console.log({s, m, h})}
+
                             <div id="hour"   style:transform={`rotate(${h}deg)`}></div>
                             <div id="minute" style:transform={`rotate(${m}deg)`}></div>
                             <div id="second" style:transform={`rotate(${s}deg)`}></div>
@@ -111,10 +112,16 @@
     {/each}
 </div>
 
-<p class="footer">
-    Made with <svg viewBox="0 0 1792 1792" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="height: 0.8rem;"><path class="heart" class:odd_heart d="M896 1664q-26 0-44-18l-624-602q-10-8-27.5-26T145 952.5 77 855 23.5 734 0 596q0-220 127-344t351-124q62 0 126.5 21.5t120 58T820 276t76 68q36-36 76-68t95.5-68.5 120-58T1314 128q224 0 351 124t127 344q0 221-229 450l-623 600q-18 18-44 18z"></path></svg> by RootM
-</p>
-    
+{#if minutes.at(-1) === '1'}
+    <p class="footer" transition:fade>
+        Made with <svg viewBox="0 0 1792 1792" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg"><path class="heart" class:odd_heart d="M896 1664q-26 0-44-18l-624-602q-10-8-27.5-26T145 952.5 77 855 23.5 734 0 596q0-220 127-344t351-124q62 0 126.5 21.5t120 58T820 276t76 68q36-36 76-68t95.5-68.5 120-58T1314 128q224 0 351 124t127 344q0 221-229 450l-623 600q-18 18-44 18z"></path></svg>  by RootM
+    </p>
+{:else}
+    <p class="footer" transition:fade>
+        Fork me on <span class="url" class:odd_heart>github.com/stagrim/basta</span>
+    </p>
+{/if}
+
 <style lang="scss">
     //TODO: break out some styling parts to different files
     @font-face {
@@ -126,7 +133,7 @@
     $inactive: #2e2e2e;
     $main: #f280a1;
     $secondary: #9966cc;
-    
+
     $diameter: 16vw;
     $diameter-height-breakpoint: 26vh;
 
@@ -199,11 +206,25 @@
         position: fixed;
         text-align: center;
         color: #787878;
+        font-size: 1.33rem;
+    }
+
+    .footer .url {
+        color: $main;
+        text-decoration: underline;
+    }
+
+    .footer .url.odd_heart {
+        color: $secondary;
     }
 
     .heart {
         fill: $main;
         transition: 1s;
+    }
+
+    .footer svg {
+        height: 1rem;
     }
 
     .heart.odd_heart {
@@ -312,7 +333,7 @@
         background-color: $main;
         transform-origin: bottom center;
         border-radius: 1px;
-        transition: 1s linear;
+        transition: 0.99s linear;
     }
 
     .active {
