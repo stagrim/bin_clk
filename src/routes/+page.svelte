@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { page } from '$app/stores';
     import { fade } from "svelte/transition";
-    export const prerender = true;
+  import { base } from "$app/paths";
 
     let time = new Date();
 
@@ -105,7 +105,7 @@
                     {@const active = Boolean(Number.parseInt(unit))}
                     <div class="circle" class:secondary class:active class:show_inactive_numbers={config.show_inactive_numbers}>
                         {#if config.santa && i === 2 && j === 0}
-                            <img src="/tomte.png" class="tomte" alt="">
+                            <img src="{base}/tomte.png" class="tomte" alt="">
                         {/if}
                         {#if config.numbers}
                             <div class="legend">{2 ** (5-j)}</div>
@@ -266,7 +266,7 @@
         width: min($diameter, $diameter-height-breakpoint + 0.3vw);
         max-height: $diameter-height-breakpoint;
         height: $diameter;
-        left: ($diameter / 2) - 3.2vw;
+        left: calc(($diameter / 2) - 3.2vw);
         top: 46vh;
         position: absolute;
     }
@@ -300,8 +300,8 @@
             $random-x: random(1000000) * 0.0001vw;
             $random-offset: random_range(-100000, 100000) * 0.0001vw;
             $random-x-end: $random-x + $random-offset;
-            $random-x-end-yoyo: $random-x + ($random-offset / 2);
-            $random-yoyo-time: random_range(30000, 80000) / 100000;
+            $random-x-end-yoyo: calc($random-x + ($random-offset / 2));
+            $random-yoyo-time: calc(random_range(30000, 80000) / 100000);
             $random-yoyo-y: $random-yoyo-time * 100vh;
             $random-scale: random(3);
             $fall-duration: random_range(10, 30) * 1s;
