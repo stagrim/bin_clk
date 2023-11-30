@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { page } from '$app/stores';
     import { fade } from "svelte/transition";
-  import { base } from "$app/paths";
+    import { base } from "$app/paths";
 
     let time = new Date();
 
@@ -211,7 +211,7 @@
         position: fixed;
         text-align: center;
         color: #787878;
-        font-size: 1.33rem;
+        font-size: 1.66rem;
     }
 
     .footer .url {
@@ -229,7 +229,7 @@
     }
 
     .footer svg {
-        height: 1rem;
+        height: 1.3rem;
     }
 
     .heart.odd_heart {
@@ -287,7 +287,7 @@
 
     .snow {
         // filter: drop-shadow(0 0 10px white);
-        $total: 200;
+        // $total: 200;
         position: absolute;
         z-index: 10;
         width: 10px;
@@ -296,7 +296,7 @@
         // border-radius: 50%;
         color: white;
 
-        @for $i from 1 through $total {
+        @for $i from 1 through 1000 {
             $random-x: random(1000000) * 0.0001vw;
             $random-offset: random_range(-100000, 100000) * 0.0001vw;
             $random-x-end: $random-x + $random-offset;
