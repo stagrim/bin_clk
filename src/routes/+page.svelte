@@ -10,7 +10,7 @@
         split: true,
         numbers: true,
         show_inactive_numbers: false,
-        winter: false,
+        winter: 0,
         santa: false,
         true_binary_seconds: false,
         info: "",
@@ -32,7 +32,7 @@
             split: !$page.url.searchParams.has("split"),
             numbers: !$page.url.searchParams.has("numbers"),
             show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
-            winter: $page.url.searchParams.has("winter"),
+            winter: Number.parseInt($page.url.searchParams.get("winter") ?? "0"),
             santa: $page.url.searchParams.has("santa"),
             true_binary_seconds: $page.url.searchParams.has("true_binary_seconds"),
             info: $page.url.searchParams.get("info") ?? "",
@@ -74,8 +74,8 @@
     }
 </script>
 
-{#if config.winter}
-    {#each Array(80) as i}
+{#if config.winter > 0}
+    {#each Array(config.winter) as i}
         <div class="snow">{@html random_snowflake()}</div>
     {/each}
 {/if}
