@@ -11,6 +11,7 @@
         numbers: true,
         show_inactive_numbers: false,
         winter: false,
+        santa: false,
         true_binary_seconds: false,
         info: "",
     }
@@ -32,6 +33,7 @@
             numbers: !$page.url.searchParams.has("numbers"),
             show_inactive_numbers: $page.url.searchParams.has("show_inactive_numbers"),
             winter: $page.url.searchParams.has("winter"),
+            santa: $page.url.searchParams.has("santa"),
             true_binary_seconds: $page.url.searchParams.has("true_binary_seconds"),
             info: $page.url.searchParams.get("info") ?? "",
         }
@@ -73,7 +75,7 @@
 </script>
 
 {#if config.winter}
-    {#each Array(75) as i}
+    {#each Array(80) as i}
         <div class="snow">{@html random_snowflake()}</div>
     {/each}
 {/if}
@@ -102,6 +104,9 @@
                 {:else}
                     {@const active = Boolean(Number.parseInt(unit))}
                     <div class="circle" class:secondary class:active class:show_inactive_numbers={config.show_inactive_numbers}>
+                        {#if config.santa && i === 2 && j === 0}
+                            <img src="/tomte.png" class="tomte" alt="">
+                        {/if}
                         {#if config.numbers}
                             <div class="legend">{2 ** (5-j)}</div>
                         {/if}
@@ -244,14 +249,26 @@
         .row {
             display: flex;
             flex-direction: column-reverse;
-            
         }
-        
+
         .circle {
             height: min($diameter-vertical, $diameter-height-breakpoint-vertical);
             width: $diameter-vertical;
             max-width: $diameter-height-breakpoint-vertical;
         }
+
+        .tomte {
+            height: min($diameter, $diameter-height-breakpoint);
+        }
+    }
+
+    .tomte {
+        width: min($diameter, $diameter-height-breakpoint + 0.3vw);
+        max-height: $diameter-height-breakpoint;
+        height: $diameter;
+        left: ($diameter / 2) - 3.2vw;
+        top: 46vh;
+        position: absolute;
     }
 
     // Snow effects
@@ -272,6 +289,7 @@
         // filter: drop-shadow(0 0 10px white);
         $total: 200;
         position: absolute;
+        z-index: 10;
         width: 10px;
         height: 10px;
         // background: white;
@@ -344,14 +362,14 @@
             background: $inactive;
         }
     }
-    
+
     $hour-length: 20%;
     #hour {
         width: 5%;
         height: $hour-length;
         margin-top: -$hour-length;
     }
-    
+
     $minute-length: 35%;
     #minute {
         width: 5%;
