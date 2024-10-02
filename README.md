@@ -2,7 +2,7 @@
 
 ![Asta Bastar](static/asta_bastar.jpg)
 
-Basta (aka Binary Asta) customizable binary clock built using Svelte for the Asta project (Asta is private at this point in time)
+Basta (aka Binary Asta) customizable binary clock built using SvelteKit for the [Asta](https://github.com/stagrim/Asta) project
 
 ## Customization
 
